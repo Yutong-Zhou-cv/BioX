@@ -1,0 +1,26 @@
+name: biox
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pandas
+  - numpy
+  - openpyxl
+  - scikit-learn
+  - tqdm
+  - matplotlib
+  - networkx
+  - seaborn
+  - geopandas
+  - shapely
+  - rioxarray
+  - xarray
+  - requests
+  - pyproj
+  - pip:
+      - pygbif
+      - dowhy
+      - bioclip
+      - ollama
