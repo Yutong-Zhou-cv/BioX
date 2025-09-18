@@ -24,6 +24,7 @@
 * [**<img src="fig/i_Acknowledgements.png" width="15" /> Acknowledgements**](#head6)
 
 ## <span id="head1"> <img src="fig/i_News.png" width="25" /> News </span>
+* 🎉 Our paper is accepted to the **[European Conference on Artificial Intelligence (ECAI 2025)](https://ecai2025.org/) Workshop** ([AISE 2025](https://sites.google.com/view/aise25)).
 
 
 ## <span id="head2"> <img src="fig/i_Overview.png" width="25" /> Overview </span>
@@ -83,7 +84,7 @@ In `config.py`, set the explanation mode:
 
 ```bash
 EXPLAIN_PARMS = {
-    "explanation_mode": "llm",  # "llm" or "rule"
+    "explanation_mode": "llm",  # "llm" (uses a local LLM via Ollama) or "rule" (template-based)
     "llm_model": "llama3.3:70b"
 }
 ```
@@ -92,7 +93,65 @@ EXPLAIN_PARMS = {
 
 `"rule"`: Use concise, template-based explanations for speed or offline use.
 
-### 4. Testing
+If you want the paper-style narratives, use `"llm"` and set up Ollama as follows.
+
+### 4. Ollama setting instructions
+
+#### 4.1 Install and start Ollama
+
+Download from https://ollama.com/download and verify installation:
+```bash
+ollama --version
+```
+Linux (optional, background service):
+```bash
+sudo systemctl enable --now ollama
+systemctl status ollama
+```
+#### 4.2 Download an LLM
+The default in `config.py` is `llama3.3:70b` (very large). If your machine is resource-limited, pull a smaller model and update `llm_model` accordingly.
+```bash
+# Large (example from config)
+ollama pull llama3.3:70b
+# Smaller alternatives (pick one you can run)
+ollama pull llama3.2:3b
+ollama pull llama3.1:8b
+```
+Quick test (should print a response):
+```bash
+ollama run llama3.2:3b "hello"
+```
+#### 4.3 [Optional] Fallback if Ollama is unavailable
+If you want the pipeline to auto-fallback from `"llm"` to `"rule"` when Ollama isn’t reachable, add this to your explanation module (e.g., in `explain.py`):
+```Python
+import json
+import os
+import socket
+import urllib.request
+
+def _ollama_available(host="127.0.0.1", port=11434, http_url="http://127.0.0.1:11434/api/tags", timeout=1.5):
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            pass
+        with urllib.request.urlopen(http_url, timeout=timeout) as r:
+            if r.status == 200:
+                _ = json.loads(r.read().decode("utf-8"))
+                return True
+    except Exception:
+        return False
+    return False
+
+def pick_explanation_mode(explain_parms):
+    mode = explain_parms.get("explanation_mode", "rule")
+    if mode == "llm" and not _ollama_available():
+        print("[Explain] Ollama not detected; falling back to rule-based explanations.")
+        return "rule"
+    return mode
+```
+
+
+
+### 5. Testing
 ```bash
 python -m run.py
 ```
