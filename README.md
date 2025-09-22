@@ -79,7 +79,22 @@ pip install -r requirements.txt
 Place your species image(s) in the `test/` folder.
 Supported formats: "jpg", "png", "jpeg", "bmp".
 
-### 3. Explanation Modes
+### 3. External Data Dependencies
+This program requires several external datasets. If automatic download fails due to network restrictions, please download them manually as described below.
+
+#### 3.1 Natural Earth Land Mask
+Download the Natural Earth land mask (ne_10m_land.zip) from:
+https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip
+
+Unzip the files and confirm ne_10m_land.shp is placed under `temp/`.
+
+#### 3.2 WorldClim BIO Variables
+Download the BIO variables (wc2.1_2.5m_bio.zip) from:
+https://geodata.ucdavis.edu/climate/worldclim/2_1/base/
+
+Place all downloaded files and extract all under `temp/wc2.1_2.5m_bio/`.
+
+### 4. Explanation Modes
 In `config.py`, set the explanation mode:
 
 ```bash
@@ -95,9 +110,9 @@ EXPLAIN_PARMS = {
 
 If you want the paper-style narratives, use `"llm"` and set up Ollama as follows.
 
-### 4. Ollama setting instructions
+### 5. Ollama setting instructions
 
-#### 4.1 Install and start Ollama
+#### 5.1 Install and start Ollama
 
 Download from https://ollama.com/download and verify installation:
 ```bash
@@ -108,7 +123,7 @@ Linux (optional, background service):
 sudo systemctl enable --now ollama
 systemctl status ollama
 ```
-#### 4.2 Download an LLM
+#### 5.2 Download an LLM
 The default in `config.py` is `llama3.3:70b` (very large). If your machine is resource-limited, pull a smaller model and update `llm_model` accordingly.
 ```bash
 # Large (example from config)
@@ -121,7 +136,7 @@ Quick test (should print a response):
 ```bash
 ollama run llama3.2:3b "hello"
 ```
-#### 4.3 [Optional] Fallback if Ollama is unavailable
+#### 5.3 [Optional] Fallback if Ollama is unavailable
 If you want the pipeline to auto-fallback from `"llm"` to `"rule"` when Ollama isn’t reachable, add this to your explanation module (e.g., in `explain.py`):
 ```Python
 import json
@@ -149,9 +164,7 @@ def pick_explanation_mode(explain_parms):
     return mode
 ```
 
-
-
-### 5. Testing
+### 6. Testing
 ```bash
 python -m run.py
 ```
@@ -161,17 +174,14 @@ python -m run.py
 If you use **BioX** in your research, please cite:
 
 > Zhou, Y. & Ryo, M. (2025). *From Images to Insights: Explainable Biodiversity Monitoring with Plain Language Habitat Explanations*.  
-> [arXiv:2506.10559v1](https://arxiv.org/abs/2506.10559v1)
+> [arXiv:2506.10559](https://arxiv.org/abs/2506.10559)
 
 ```bibtex
-@misc{zhou2025biox,
-      title={From Images to Insights: Explainable Biodiversity Monitoring with Plain Language Habitat Explanations}, 
-      author={Yutong Zhou and Masahiro Ryo},
-      year={2025},
-      eprint={2506.10559},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2506.10559}, 
+@article{zhou2025images,
+  title={From Images to Insights: Explainable Biodiversity Monitoring with Plain Language Habitat Explanations},
+  author={Zhou, Yutong and Ryo, Masahiro},
+  journal={arXiv preprint arXiv:2506.10559},
+  year={2025}
 }
 ```
 
